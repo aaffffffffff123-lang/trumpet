@@ -63,7 +63,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f4e2c4;font-family:va
 #air.blow .zone.on{background:linear-gradient(90deg,#ffcf3a,#ff8f3a);color:#4a1200}
 #thumb{position:absolute;left:50%;width:66px;height:66px;margin:0 0 -33px -33px;border-radius:50%;pointer-events:none;display:none;
   background:radial-gradient(circle,rgba(255,255,255,.95) 0 26%,rgba(255,210,100,.6) 50%,rgba(255,210,100,0) 70%)}
-#valves{position:absolute;right:calc(14px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px;pointer-events:auto}
+#valves{position:absolute;right:calc(14px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column-reverse;gap:clamp(24px,3.2vh,28px);pointer-events:auto}
 .valve{width:78px;height:78px;border-radius:50%;border:7px solid var(--brass);box-sizing:border-box;position:relative;display:grid;place-items:center;touch-action:none;cursor:pointer;
   background:radial-gradient(circle at 34% 28%,#fff 0,#f6f1ff 22%,#e7dcf9 47%,#f8e0ea 70%,#d9e7f7 100%);
   box-shadow:0 5px 0 #8a5d16,0 10px 16px rgba(60,30,0,.35),inset 0 -6px 10px rgba(120,90,160,.3),inset 0 2px 0 rgba(255,255,255,.95);transition:transform .04s,box-shadow .04s}
@@ -71,7 +71,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f4e2c4;font-family:va
 .valve em{position:absolute;right:-8px;bottom:-6px;font-style:normal;font-size:11px;font-weight:700;background:var(--ink);color:#fff;border-radius:6px;padding:1px 6px;display:none}
 body.pc .valve em{display:block}
 .valve.on{transform:translateY(5px);border-color:#c38f25;box-shadow:0 0 0 #8a5d16,0 4px 8px rgba(60,30,0,.35),inset 0 4px 12px rgba(80,60,120,.38)}
-@media (max-height:430px){:root{--airH:min(66vh,500px)}.valve{width:66px;height:66px;border-width:6px}.valve span{font-size:22px}#valves{gap:10px}}
+@media (max-height:430px){:root{--airH:min(66vh,500px)}.valve{width:66px;height:66px;border-width:6px}.valve span{font-size:22px}#valves{gap:18px}}
 .screen{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;overflow-y:auto;touch-action:pan-y;
   padding:max(18px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom));box-sizing:border-box;background:rgba(244,226,196,.35)}
 .screen.hidden{display:none}
@@ -142,7 +142,7 @@ label.name input:focus{border-color:var(--ox);box-shadow:0 0 0 3px rgba(163,38,4
     <button id="startBtn" class="btn" disabled>악기 꺼내는 중</button>
     <div class="howto">
       <div><b class="ic-air"></b><p>왼쪽 띠를 누르면 붑니다. 위로 올릴수록 바람이 세져서 높은 배음이 납니다. 칸 경계에 걸쳐 누르면 삑사리가 날 수 있습니다.</p></div>
-      <div><span class="ic-valve"><i></i><i></i><i></i></span><p>오른쪽 동그라미 셋은 밸브 1, 2, 3입니다. 오른손 세 손가락으로 누르세요.</p></div>
+      <div><span class="ic-valve"><i></i><i></i><i></i></span><p>오른쪽 동그라미 셋은 밸브입니다. 오른손 검지부터 1, 2, 3 순서로 누르세요.</p></div>
       <p class="pc-keys">PC: 스페이스바 불기, W와 S로 바람 세기, J K L로 밸브</p>
     </div>
     <p class="foot">휴대폰은 세로로 왼손에 쥐고 엄지로 띠를 누르면 편합니다. 무음 모드에서는 소리가 안 날 수 있습니다.</p>
@@ -570,14 +570,14 @@ function nearestOf(arr, x) { let b = arr[0], d = 1e9; for (const a of arr) { con
 function nearestOct(pc, ref, lo, hi) { let best = null, bd = 1e9; for (let m = lo; m <= hi; m++) if (mod12(m) === pc && Math.abs(m - ref) < bd) { bd = Math.abs(m - ref); best = m; } return best; }
 
 // ===================== 곡 진행 계획 =====================
-// 인트로 → 테마 2번 → 트롬본 솔로 → 피아노 솔로 → 내 솔로(2~4코러스) → 테마 → 태그 → 끝
+// 인트로 → 테마 → 트롬본 솔로 → 피아노 솔로 → 내 솔로(2~4코러스) → 테마 → 태그 → 끝
 const MUS = {
   tempo: 126, beat: 60 / 126, swing: 0.63, startTime: 0, nextBar: -2, running: false, finished: false,
   plan: [], meChoruses: 2, endTime: 0,
 };
 function resetPlan() {
   MUS.plan = [
-    { type: 'intro', bars: 4 }, { type: 'head', bars: 24 }, { type: 'tb', bars: 12 }, { type: 'pn', bars: 12 },
+    { type: 'intro', bars: 4 }, { type: 'head', bars: 12 }, { type: 'tb', bars: 12 }, { type: 'pn', bars: 12 },
     { type: 'me', bars: 24 }, { type: 'out', bars: 12 }, { type: 'tag', bars: 4 }, { type: 'end', bars: 2 },
   ];
   MUS.meChoruses = 2;
@@ -1858,7 +1858,7 @@ const STAGE_LOOK = V3(0.25, 1.9, -0.35);
 const REACT = {
   section: 'title', excite: 0.25, lean: 0, stats: null, ph: { closed: true, count: 0, lastOff: 0, notes: [] },
   snappers: [], lastSnapBeat: -1e9, longFlag: false, highFlag: false, lastNoteT: 0, soloStartT: 0, silence: 0,
-  lastOutside: 0, lastRepeat: 0, afterglowUntil: 0, nextSnapPick: 0, spot: 0,
+  lastOutside: 0, lastRepeat: 0, lastOffturnReact: -1e9, afterglowUntil: 0, nextSnapPick: 0, spot: 0,
 };
 let NAME = '무명', TEMPO = 126;
 function resetStats() { REACT.stats = { yeah: 0, whistle: 0, stood: 0, drinks: 0, tips: 0, cracks: 0, maxWritten: 0 }; }
@@ -2017,9 +2017,28 @@ function drumAnswer() {
   drumHit('snare', t, 0.5); drumHit('kick', t, 0.35);
   const t2 = nextSlotTime(t + 0.02); drumHit(Math.random() < 0.5 ? 'snare' : 'tom1', t2, 0.4);
 }
+function offTurnApplause(ph, force = false) {
+  const n = AE.ctx.currentTime;
+  if (!['count', 'intro', 'head', 'tb', 'pn'].includes(REACT.section)) return;
+  if (!force && ph.count < 4) return;
+  if (n - REACT.lastOffturnReact < 6) return;
+  REACT.lastOffturnReact = n;
+  REACT.afterglowUntil = Math.max(REACT.afterglowUntil, visNow() + 2.1);
+  const high = ph.notes.some(x => x.partial >= 7), strong = force || high || ph.count >= 8;
+  const ps = pickPeople(strong ? 3 : 2);
+  ps.forEach((p, i) => {
+    p.bored = false; if (p.idle === 'phone' || p.idle === 'chin') p.idle = null; p.chatUntil = 0;
+    startClap(p, { rate: rand(3.0, 4.0), dur: rand(strong ? 1.3 : 0.9, strong ? 1.9 : 1.35), gain: strong ? 0.2 : 0.16, delay: i * 0.08 });
+  });
+  if (ps[0]) {
+    ps[0].say(strong ? 'whoo' : 'yeah', pick(strong ? ['오오!', '좋은데!', '트럼펫도 온다!'] : ['오!', '그렇지!', '좋다!']), { when: n + 0.08, gain: 0.34 });
+    if (!strong) REACT.stats.yeah++;
+  }
+}
 function closePhrase() {
   const ph = REACT.ph; ph.closed = true;
-  if (REACT.section !== 'me' || ph.count < 2) return;
+  if (ph.count < 2) return;
+  if (REACT.section !== 'me') { offTurnApplause(ph); return; }
   const n = AE.ctx.currentTime, fast = ph.count >= 10;
   const k = 1 + Math.floor(REACT.excite * 2.5) + (fast ? 1 : 0);
   pickPeople(Math.min(4, k)).forEach((p, i) => {
@@ -2071,7 +2090,7 @@ TPT.listeners.push((type, d) => {
     REACT.ph.lastOff = n;
   } else if (type === 'crack') {
     REACT.stats.cracks++; UI.crack();
-    if (REACT.section !== 'me') return;
+    if (REACT.section !== 'me') { offTurnApplause(REACT.ph, true); return; }
     REACT.excite = Math.min(1, REACT.excite + 0.08);
     const ps = pickPeople(3);
     if (ps[0]) { ps[0].say('oh', pick(L_CRACK), { when: n + 0.12 }); ps[0].surprise = visNow() + 1.1; }
@@ -2116,9 +2135,10 @@ REACT.update = function (dt, now) {
   const glow = sec === 'me' || sec === 'final';
   for (const p of aud()) {
     let look = STAGE_LOOK, nod = 0.35, smile = p.smileBase * 0.6, lean = 0;
-    if (sec === 'tb') { look = G.band.tb.headWorld(); nod = 0.25; smile *= 0.6; }
+    if (now < this.afterglowUntil) { look = you; nod = 0.32 + this.excite * 0.8; smile = 0.55 + this.excite * 0.45; lean = this.lean; }
+    else if (sec === 'tb') { look = G.band.tb.headWorld(); nod = 0.25; smile *= 0.6; }
     else if (sec === 'pn') { look = G.band.pn.headWorld(); nod = 0.22; smile *= 0.6; }
-    else if (sec === 'me' || sec === 'final' || now < this.afterglowUntil) { look = you; nod = 0.32 + this.excite * 0.8; smile = 0.55 + this.excite * 0.45; lean = this.lean; }
+    else if (sec === 'me' || sec === 'final') { look = you; nod = 0.32 + this.excite * 0.8; smile = 0.55 + this.excite * 0.45; lean = this.lean; }
     else if (sec === 'title') { nod = 0.12; smile = p.smileBase * 0.5; look = p.titleLook || STAGE_LOOK; }
     if (p.bored) { nod *= 0.3; smile *= 0.35; look = p.boredLook || look; }
     p.lookAt = look; p.nodTarget = nod; p.smileV += (smile - p.smileV) * Math.min(1, dt * 2); p.leanTarget = lean;
@@ -2185,7 +2205,7 @@ UI.showEnd = function () {
   const s = REACT.stats, rows = [
     ['Yeah!', `${s.yeah}번`], ['휘파람', `${s.whistle}번`], ['일어나서 박수 친 사람', `${s.stood}명`],
     ['무대로 온 술', `${s.drinks}잔`], ['팁 통에 들어온 돈', `${s.tips}장`],
-    ['삑사리', s.cracks ? `${s.cracks}번, 전부 박수 받음` : '0번'],
+    ['삑사리', s.cracks ? `${s.cracks}번, 박수 받음` : '0번'],
     ['가장 높은 음', s.maxWritten ? noteName(s.maxWritten) : '안 붊'], ['내 솔로', `${MUS.meChoruses}코러스`],
   ];
   this.el.stats.innerHTML = rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('');
@@ -2216,8 +2236,8 @@ function startShow(encore) {
   TEMPO = encore ? Math.min(150, TEMPO + 8) : 126;
   resetStats(); clearProps(); clearBored();
   TPT.history.length = 0; TPT.maxWritten = 0; TPT.cracks = 0;
-  for (const p of [...aud(), G.band.tb, G.band.pn, G.band.bartender]) { if (!p.alwaysStand) p.standTarget = 0; if (!p.isBand) p.idle = null; p.action = null; p.vocalUntil = 0; p.vocalStart = 0; p.surprise = 0; p.bliss = 0; p.grinUntil = 0; p.chatUntil = 0; p.snapAt = -9; p.slapAt = -9; p.shakeUntil = 0; p.peekUntil = 0; p.clapTimes = []; }
-  APP.clear(); REACT.nextSnapPick = 0; REACT.snappers = [];
+  for (const p of [...aud(), G.band.tb, G.band.pn, G.band.bartender]) { if (!p.alwaysStand) p.standTarget = 0; if (!p.isBand) p.idle = null; p.action = null; p.vocalUntil = 0; p.vocalStart = 0; p.surprise = 0; p.bliss = 0; p.grinUntil = 0; p.chatUntil = 0; p.snapAt = -9; p.slapAt = -9; p.shakeUntil = 0; p.peekUntil = 0; p.clapping = false; p.clapHigh = false; p.clapTimes = []; }
+  APP.clear(); REACT.nextSnapPick = 0; REACT.snappers = []; REACT.lastOffturnReact = -1e9;
   REACT.excite = encore ? 0.45 : 0.25; REACT.afterglowUntil = 0; REACT.section = 'count'; REACT.ph = { closed: true, count: 0, lastOff: 0, notes: [] };
   G.band.tb.turnTarget = 0;
   UI.setlist('head');
@@ -2287,19 +2307,19 @@ function frame() {
 }
 async function boot() {
   try { await Promise.race([Promise.all([document.fonts.load('40px "Black Han Sans"'), document.fonts.load('20px "Gowun Dodum"')]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { }
-  initScene(); buildPeople(); buildBand(); UI.init();
-  for (const p of aud()) p.titleLook = Math.random() < 0.5 ? STAGE_LOOK : V3(rand(-4, 4), 1.2, rand(-9, -2));
-  aud().filter(p => Math.random() < 0.3).forEach(p => p.chatUntil = 1e9);
-  bindInput();
-  tickHooks.push(applauseTick, snapTick);
-  requestAnimationFrame(loop);
   try {
+    UI.init(); initScene(); buildPeople(); buildBand();
+    for (const p of aud()) p.titleLook = Math.random() < 0.5 ? STAGE_LOOK : V3(rand(-4, 4), 1.2, rand(-9, -2));
+    aud().filter(p => Math.random() < 0.3).forEach(p => p.chatUntil = 1e9);
+    bindInput();
+    tickHooks.push(applauseTick, snapTick);
+    requestAnimationFrame(loop);
     await initAudio(); initTrumpet(); setBabble(0.5);
     if (!schedTimer) schedTimer = setInterval(schedTick, 25);
     UI.ready();
     document.addEventListener('visibilitychange', () => { if (!AE.ctx) return; if (document.hidden) AE.ctx.suspend(); else AE.ctx.resume(); });
-  } catch (e) { console.error(e); UI.fail(); }
-  if (/[?&]auto=1/.test(location.search)) DBG.start('현규');
+    if (/[?&]auto=1/.test(location.search)) DBG.start('현규');
+  } catch (e) { console.error(e); if (UI.el.startBtn) UI.fail(); }
 }
 boot();
 
