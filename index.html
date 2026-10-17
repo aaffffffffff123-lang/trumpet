@@ -99,10 +99,7 @@ label.name input:focus{border-color:var(--ox);box-shadow:0 0 0 3px rgba(163,38,4
 .ic-valve i{display:block;width:18px;height:18px;border-radius:50%;border:3px solid var(--brass);box-sizing:border-box;background:#f6f1ff}
 .pc-keys{font-size:13px;opacity:.85}
 .foot{font-size:12.5px;line-height:1.5;margin:14px 0 0;opacity:.85}
-#stats{list-style:none;margin:6px 0 18px;padding:0;border-top:2px dashed rgba(29,42,77,.4)}
-#stats li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 2px;border-bottom:2px dashed rgba(29,42,77,.25);font-size:15px}
-#stats b{font-family:var(--fd);font-weight:400;font-size:19px;color:var(--ox);text-align:right}
-.end h1{font-size:clamp(38px,10.5vw,58px);padding-right:0}
+.end h1{font-size:clamp(38px,10.5vw,58px);padding-right:0;margin-bottom:22px}
 @media (prefers-reduced-motion:reduce){#announce.go,#crack.go,#air.shake{animation-duration:.01s}}
 </style>
 </head>
@@ -151,9 +148,8 @@ label.name input:focus{border-color:var(--ox);box-shadow:0 0 0 3px rgba(163,38,4
 <div id="end" class="screen hidden">
   <div class="poster end">
     <div class="moon"></div>
-    <p class="venue">오늘의 반응</p>
+    <p class="venue">재즈바 낮달</p>
     <h1 id="endName">브라보!</h1>
-    <ul id="stats"></ul>
     <button id="againBtn" class="btn">한 곡 더</button>
     <button id="homeBtn" class="btn ghost">처음 화면</button>
   </div>
@@ -363,8 +359,8 @@ async function initAudio(ctxOverride) {
   const bus = (gain, send) => { const g = ctx.createGain(); g.gain.value = gain; g.connect(master); const s = ctx.createGain(); s.gain.value = send; g.connect(s); s.connect(rev); return g; };
   AE.master = master;
   AE.buses = {
-    band: bus(0.34, 0.22), bass: bus(0.46, 0.08), drums: bus(0.32, 0.15), trumpet: bus(1.15, 0.24),
-    crowd: bus(0.95, 0.32), clap: bus(1.6, 0.26), fx: bus(0.8, 0.2)
+    band: bus(0.6, 0.22), bass: bus(0.62, 0.08), drums: bus(0.54, 0.15), trumpet: bus(0.72, 0.24),
+    crowd: bus(0.95, 0.32), clap: bus(1.35, 0.26), fx: bus(0.8, 0.2)
   };
   // 웅성거림 버스 (멀리서 들리게 저역통과)
   const babLP = ctx.createBiquadFilter(); babLP.type = 'lowpass'; babLP.frequency.value = 2200;
@@ -736,7 +732,7 @@ function genDrums(t0, o) {
     if (!(o.fill && b >= 2)) drumHit('ride', tb, (b % 2 ? 0.6 : 0.5) * o.ride);
     if ((b === 1 || b === 3) && !(o.fill && b === 3)) drumHit('ride', t0 + (b + MUS.swing) * MUS.beat, 0.36 * o.ride);
     if (b === 1 || b === 3) drumHit('hat', tb, 0.42);
-    drumHit('kick', tb, 0.1);
+    drumHit('kick', tb, 0.18);
   }
   let cnt = 0;
   for (let s = 1; s < 8; s += 2) {
@@ -799,7 +795,7 @@ function genBar(bar) {
   // 피아노
   if (sg.type === 'pn') {
     if (!BAND.pnSolo) BAND.pnSolo = new Soloist(65, 86, { minLen: 6, maxLen: 13, restMin: 2, restMax: 4, longProb: 0.14, skip: 0.1, turn: 0.2, legato: 0.86 });
-    BAND.pnSolo.bar(t0, chords, 1).forEach(n => { playNote('pn', n.midi, n.t, n.dur, n.vel * 0.62, AE.buses.band, { release: 0.12 }); vq(n.t, 'pnNote', { midi: n.midi }); });
+    BAND.pnSolo.bar(t0, chords, 1).forEach(n => { playNote('pn', n.midi, n.t, n.dur, n.vel * 0.8, AE.buses.band, { release: 0.12 }); vq(n.t, 'pnNote', { midi: n.midi }); });
     if (Math.random() < 0.55) compHit(posTime(t0, pick([1, 1.5, 2.5])), chords[chords.length - 1], 0.4, 0.26);
   } else genComp(t0, chords, st.pdens);
   // 트롬본
@@ -877,7 +873,7 @@ function tEmit(type, d) { for (const f of TPT.listeners) f(type, d); }
 function initTrumpet() {
   const ctx = AE.ctx;
   const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 4000; f.Q.value = 0.5;
-  const pres = ctx.createBiquadFilter(); pres.type = 'peaking'; pres.frequency.value = 1400; pres.gain.value = 2.5; pres.Q.value = 0.8;
+  const pres = ctx.createBiquadFilter(); pres.type = 'peaking'; pres.frequency.value = 1400; pres.gain.value = 1; pres.Q.value = 0.8;
   const g = ctx.createGain(); g.gain.value = 0.95;
   f.connect(pres); pres.connect(g); g.connect(AE.buses.trumpet);
   TPT.bus = f; TPT.filt = f;
@@ -2159,7 +2155,7 @@ REACT.update = function (dt, now) {
 const UI = { bubbles: [], el: {} };
 UI.init = function () {
   const $ = id => document.getElementById(id);
-  Object.assign(this.el, { bubbles: $('bubbles'), setlist: $('setlist'), rdNote: $('rdNote'), rdP: $('rdP'), rdV: $('rdV'), rdLow: $('rdLow'), readout: $('readout'), air: $('air'), thumb: $('thumb'), announce: $('announce'), glow: $('glow'), crack: $('crack'), title: $('title'), end: $('end'), startBtn: $('startBtn'), nameIn: $('nameIn'), stats: $('stats'), endName: $('endName') });
+  Object.assign(this.el, { bubbles: $('bubbles'), setlist: $('setlist'), rdNote: $('rdNote'), rdP: $('rdP'), rdV: $('rdV'), rdLow: $('rdLow'), readout: $('readout'), air: $('air'), thumb: $('thumb'), announce: $('announce'), glow: $('glow'), crack: $('crack'), title: $('title'), end: $('end'), startBtn: $('startBtn'), nameIn: $('nameIn'), endName: $('endName') });
   const zs = this.el.air.querySelectorAll('.zone'); this.zones = [...zs];
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) document.body.classList.add('pc');
   this.el.startBtn.addEventListener('click', () => startShow(false));
@@ -2202,13 +2198,6 @@ UI.setlist = function (seg) {
   this.el.setlist.querySelectorAll('span').forEach(s => { const i = order.indexOf(s.dataset.s); s.classList.toggle('now', i === ci); s.classList.toggle('done', seg === 'done' || (ci >= 0 && i < ci)); });
 };
 UI.showEnd = function () {
-  const s = REACT.stats, rows = [
-    ['Yeah!', `${s.yeah}번`], ['휘파람', `${s.whistle}번`], ['일어나서 박수 친 사람', `${s.stood}명`],
-    ['무대로 온 술', `${s.drinks}잔`], ['팁 통에 들어온 돈', `${s.tips}장`],
-    ['삑사리', s.cracks ? `${s.cracks}번, 박수 받음` : '0번'],
-    ['가장 높은 음', s.maxWritten ? noteName(s.maxWritten) : '안 붊'], ['내 솔로', `${MUS.meChoruses}코러스`],
-  ];
-  this.el.stats.innerHTML = rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('');
   this.el.endName.textContent = `브라보, ${NAME}!`;
   this.el.end.classList.remove('hidden');
 };
